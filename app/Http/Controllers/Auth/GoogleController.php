@@ -43,7 +43,7 @@ class GoogleController extends Controller
                 'google_id'         => $googleUser->getId(),
                 'role'              => 'user',
                 'email_verified_at' => now(), // Google sudah verifikasi email
-                'password'          => null,
+                'password'          => bcrypt(str()->random(24)),
             ]);
         }
 
