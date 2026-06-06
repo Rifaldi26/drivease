@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Jobs\KirimPengingatSewa;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Kirim pengingat H-1 setiap hari jam 08.00 pagi
+Schedule::job(new KirimPengingatSewa)->dailyAt('08:00');
