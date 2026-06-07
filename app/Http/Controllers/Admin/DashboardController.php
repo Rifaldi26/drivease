@@ -14,9 +14,9 @@ class DashboardController extends Controller
     {
         $stats = [
             'total_mobil'        => Mobil::count(),
-            'mobil_tersedia'     => Mobil::tersedia()->count(),
-            'mobil_disewa'       => Mobil::disewa()->count(),
-            'mobil_perawatan'    => Mobil::perawatan()->count(),
+            'mobil_tersedia'     => Mobil::where('status', 'tersedia')->count(),
+            'mobil_disewa'       => Mobil::where('status', 'disewa')->count(),
+            'mobil_perawatan'    => Mobil::where('status', 'perawatan')->count(),
             'total_pemesanan'    => Pemesanan::count(),
             'pending'            => Pemesanan::where('status', 'pending')->count(),
             'menunggu_konfirmasi'=> Pemesanan::where('status', 'menunggu_konfirmasi_admin')->count(),
