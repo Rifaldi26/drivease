@@ -138,5 +138,8 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::post('/chat/{lawan}/kirim', [AdminChat::class, 'kirim'])->name('chat.kirim');
 });
 
+// Redirect halaman login/register ke home — modal akan terbuka via ?modal=login
+Route::get('login',    fn() => redirect('/?modal=login'))->name('login');
+
 // ── Breeze auth routes (login, register, dll) ─────────────────
 require __DIR__.'/auth.php';

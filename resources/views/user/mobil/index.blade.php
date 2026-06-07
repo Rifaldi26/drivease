@@ -245,19 +245,31 @@
             Daftar gratis untuk memesan, memantau status, dan menyimpan favorit Anda.
         </p>
         <div class="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <a href="{{ route('register') }}"
-               class="w-full sm:w-auto rounded-xl bg-[#3b6fd4] px-6 py-2.5 text-sm
-                      font-semibold text-white hover:bg-[#2e5bb8] transition-colors">
+            {{-- Tombol Daftar --}}
+            <button @click="$dispatch('open-register')"
+                    class="w-full sm:w-auto rounded-xl bg-[#3b6fd4] px-6 py-2.5 text-sm
+                           font-semibold text-white hover:bg-[#2e5bb8] transition-colors">
                 Daftar Sekarang — Gratis
-            </a>
-            <a href="{{ route('login') }}"
-               class="w-full sm:w-auto rounded-xl border border-[#e5e9f2] px-6 py-2.5 text-sm
-                      font-medium text-[#18213a] hover:bg-[#f1f4fa] transition-colors">
+            </button>
+            {{-- Tombol Masuk --}}
+            <button @click="$dispatch('open-login')"
+                    class="w-full sm:w-auto rounded-xl border border-[#e5e9f2] px-6 py-2.5 text-sm
+                           font-medium text-[#18213a] hover:bg-[#f1f4fa] transition-colors">
                 Sudah punya akun? Masuk
-            </a>
+            </button>
         </div>
     </div>
 </section>
 @endguest
+
+@if(request('modal'))
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        window.dispatchEvent(new CustomEvent('open-{{ request('modal') === 'register' ? 'register' : 'login' }}'));
+    });
+</script>
+@endpush
+@endif
 
 @endsection

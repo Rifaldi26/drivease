@@ -89,18 +89,14 @@
                                     Sewa Sekarang
                                 </a>
                             @else
-                                <a href="{{ route('login') }}"
-                                   class="flex w-full items-center justify-center gap-2 rounded-xl
-                                          bg-[#3b6fd4] py-3 text-sm font-semibold text-white
-                                          hover:bg-[#2e5bb8] transition-colors">
+                                <button @click="$dispatch('open-login')"
+                                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3b6fd4] py-3 text-sm font-semibold text-white hover:bg-[#2e5bb8] transition-colors">
                                     Masuk untuk Memesan
-                                </a>
+                                </button>
                             @endauth
                         @else
                             <button disabled
-                                    class="flex w-full items-center justify-center rounded-xl
-                                           bg-gray-100 py-3 text-sm font-medium text-gray-400
-                                           cursor-not-allowed">
+                                    class="flex w-full items-center justify-center rounded-xl bg-gray-100 py-3 text-sm font-medium text-gray-400 cursor-not-allowed">
                                 Tidak Tersedia
                             </button>
                         @endif

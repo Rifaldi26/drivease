@@ -54,3 +54,22 @@ function pollNotifBadge() {
 }
 
 document.addEventListener('DOMContentLoaded', pollNotifBadge);
+
+// ── Auth Modal ──────────────────────────────────────────────
+window.authModal = function() {
+    return {
+        isOpen: false,
+        tab: 'login',
+
+        open(tab = 'login') {
+            this.tab = tab;
+            this.isOpen = true;
+            document.body.style.overflow = 'hidden';
+        },
+
+        close() {
+            this.isOpen = false;
+            document.body.style.overflow = '';
+        }
+    }
+}

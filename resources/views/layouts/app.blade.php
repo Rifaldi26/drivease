@@ -145,16 +145,14 @@
                     </div>
 
                 @else
-                    <a href="{{ route('login') }}"
-                       class="rounded-lg border border-[#e5e9f2] bg-white px-3 py-1.5
-                              text-sm font-medium text-[#18213a] hover:bg-[#f1f4fa] transition-colors">
+                    <button @click="$dispatch('open-login')"
+                            class="rounded-lg border border-[#e5e9f2] bg-white px-3 py-1.5 text-sm font-medium text-[#18213a] hover:bg-[#f1f4fa] transition-colors">
                         Masuk
-                    </a>
-                    <a href="{{ route('register') }}"
-                       class="rounded-lg bg-[#3b6fd4] px-3 py-1.5 text-sm font-medium
-                              text-white hover:bg-[#2e5bb8] transition-colors">
+                    </button>
+                    <button @click="$dispatch('open-register')"
+                            class="rounded-lg bg-[#3b6fd4] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#2e5bb8] transition-colors">
                         Daftar
-                    </a>
+                    </button>
                 @endauth
             </div>
         </div>
@@ -235,19 +233,14 @@
                         </form>
                     </div>
                 @else
-                    <div class="border-t border-[#e5e9f2] pt-3 mt-3 space-y-2">
-                        <a href="{{ route('login') }}"
-                           class="flex w-full items-center justify-center rounded-lg border
-                                  border-[#e5e9f2] py-2.5 text-sm font-medium text-[#18213a]
-                                  hover:bg-[#f1f4fa] transition-colors">
-                            Masuk
-                        </a>
-                        <a href="{{ route('register') }}"
-                           class="flex w-full items-center justify-center rounded-lg bg-[#3b6fd4]
-                                  py-2.5 text-sm font-medium text-white hover:bg-[#2e5bb8] transition-colors">
-                            Daftar Gratis
-                        </a>
-                    </div>
+                    <button @click="$dispatch('open-login')"
+                            class="rounded-lg border border-[#e5e9f2] bg-white px-3 py-1.5 text-sm font-medium text-[#18213a] hover:bg-[#f1f4fa] transition-colors">
+                        Masuk
+                    </button>
+                    <button @click="$dispatch('open-register')"
+                            class="rounded-lg bg-[#3b6fd4] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#2e5bb8] transition-colors">
+                        Daftar
+                    </button>
                 @endauth
             </nav>
         </aside>
@@ -302,7 +295,9 @@
         </ul>
     </nav>
     @endauth
-
+    @guest
+        <x-auth-modal />
+    @endguest
     @stack('scripts')
 </body>
 </html>
