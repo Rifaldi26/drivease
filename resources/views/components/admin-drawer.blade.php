@@ -3,7 +3,7 @@ $groups = [
     [
         'label' => null,
         'items' => [
-            ['route'=>'admin.dashboard','icon'=>'chart-bar','label'=>'Dasbor',
+            ['route'=>'admin.dashboard','icon'=>'chart-bar','label'=>'Beranda',
              'active'=> request()->routeIs('admin.dashboard')],
         ],
     ],
@@ -28,12 +28,10 @@ $groups = [
         ],
     ],
     [
-        'label' => 'Komunikasi',
+        'label'  => null,
         'items' => [
-            ['route'=>'admin.chat.index',      'icon'=>'chat','label'=>'Chat',
+            ['route'=>'admin.chat.index','icon'=>'chat', 'label'  => 'Chat',
              'active'=> request()->routeIs('admin.chat.*')],
-            ['route'=>'admin.notifikasi.index','icon'=>'bell','label'=>'Notifikasi',
-             'active'=> request()->routeIs('admin.notifikasi.*')],
         ],
     ],
 ];
@@ -81,33 +79,3 @@ $groups = [
             </div>
         </div>
     @endforeach
-
-    {{-- Pengaturan --}}
-    <div class="border-t border-gray-100 pt-3">
-        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium
-                           text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
-            <x-icon name="settings" class="w-4 h-4" />
-            Pengaturan
-        </a>
-    </div>
-</nav>
-
-{{-- User Info --}}
-<div class="border-t border-gray-100 p-4 mt-auto">
-    <div class="flex items-center gap-3">
-        <x-avatar :name="auth()->user()->name" size="sm" />
-        <div class="min-w-0 flex-1">
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</p>
-            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
-        </div>
-    </div>
-    <form method="POST" action="{{ route('logout') }}" class="mt-3">
-        @csrf
-        <button type="submit"
-                class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-200
-                       py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
-            <x-icon name="logout" class="w-4 h-4" />
-            Keluar
-        </button>
-    </form>
-</div>

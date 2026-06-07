@@ -1,7 +1,7 @@
 @php
 $groups = [
     [
-        'label' => 'Dasbor',
+        'label' => 'Beranda',
         'single' => true,
         'route'  => 'admin.dashboard',
         'icon'   => 'chart-bar',
@@ -27,20 +27,11 @@ $groups = [
         ],
     ],
     [
-        'label'  => 'Komunikasi',
-        'single' => false,
-        'active' => request()->routeIs('admin.chat.*','admin.notifikasi.*'),
-        'items'  => [
-            ['route'=>'admin.chat.index',       'icon'=>'chat','label'=>'Chat'],
-            ['route'=>'admin.notifikasi.index', 'icon'=>'bell','label'=>'Notifikasi'],
-        ],
-    ],
-    [
-        'label'  => 'Pengaturan',
+        'label'  => 'Chat',
         'single' => true,
-        'route'  => 'admin.dashboard',
-        'icon'   => 'settings',
-        'active' => false,
+        'route'  =>'admin.chat.index',
+        'icon'   =>'chat',
+        'active' => request()->routeIs('admin.chat.*'),
     ],
 ];
 @endphp
