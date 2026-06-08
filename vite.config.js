@@ -8,4 +8,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        https: true,
+        cors: true,
+        hmr: {
+            host: 'croon-yo-yo-zesty.ngrok-free.dev',
+            protocol: 'wss',         // pakai wss bukan ws karena HTTPS
+        },
+    },
 });

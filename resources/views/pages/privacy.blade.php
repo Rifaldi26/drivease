@@ -11,10 +11,24 @@
             Terakhir diperbarui : {{ $page->updated_at->translatedFormat('j F Y') }}
         </p>
         
-        <div class="prose prose-sm max-w-none text-[#18213a] mt-8">
-            {{-- Menampilkan isi konten dari database (tag HTML tidak di-escape) --}}
-            {!! $page->content !!}
-        </div>
+        @php $content = json_decode($page->content, true); @endphp
+
+        @foreach($content['sections'] as $section)
+            <h3 class="font-semibold text-[#18213a] mt-8">{{ $section['title'] }}</h3>
+            
+            @if($section['intro'])
+                <p class="mt-2">{{ $section['intro'] }}</p>
+            @endif
+        
+            <ul class="list-disc pl-5 mt-2 space-y-2">
+                @foreach($section['items'] as $item)
+                    <li>
+                        @if($item['label'])<strong>{{ $item['label'] }}:</strong> @endif
+                        {{ $item['text'] }}
+                    </li>
+                @endforeach
+            </ul>
+        @endforeach
     </div>
 </div>
 @endsection

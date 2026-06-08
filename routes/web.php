@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\LaporanController        as AdminLaporan;
 use App\Http\Controllers\Admin\AkuntansiController      as AdminAkuntansi;
 use App\Http\Controllers\Admin\NotifikasiController     as AdminNotifikasi;
 use App\Http\Controllers\Admin\ChatController           as AdminChat;
+use App\Http\Controllers\Admin\PageController           as AdminPage;
 use App\Http\Controllers\User\DashboardController       as UserDashboard;
 use App\Http\Controllers\User\MobilController           as UserMobil;
 use App\Http\Controllers\User\PemesananController       as UserPemesanan;
@@ -137,6 +138,11 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::get('/chat', [AdminChat::class, 'index'])->name('chat.index');
     Route::get('/chat/{lawan}/pesan', [AdminChat::class, 'riwayat'])->name('chat.riwayat');
     Route::post('/chat/{lawan}/kirim', [AdminChat::class, 'kirim'])->name('chat.kirim');
+
+    // ── Manajemen Halaman (CMS) ───────────────────────────────
+    Route::get('/pages', [AdminPage::class, 'index'])->name('pages.index');
+    Route::get('/pages/{slug}/edit', [AdminPage::class, 'edit'])->name('pages.edit');
+    Route::put('/pages/{slug}', [AdminPage::class, 'update'])->name('pages.update');
 });
 
 // Redirect halaman login/register ke home — modal akan terbuka via ?modal=login
