@@ -182,13 +182,13 @@
             {{-- Footer Legal --}}
             <p class="mt-4 text-center text-[10px] leading-relaxed text-[#7a8499]">
                 Dengan melanjutkan, kamu menyetujui
-                <a href="https://www.traveloka.com/id-id/termsandconditions"
+                <a href="{{ route('terms') }}"
                    target="_blank" rel="noopener"
                    class="text-[#3b6fd4] underline underline-offset-2 hover:text-[#2e5bb8]">
                     Syarat &amp; Ketentuan
                 </a>
                 ini dan kamu sudah diberitahu mengenai
-                <a href="https://www.traveloka.com/id-id/privacy-notice"
+                <a href="{{ route('privacy') }}"
                    target="_blank" rel="noopener"
                    class="text-[#3b6fd4] underline underline-offset-2 hover:text-[#2e5bb8]">
                     Pemberitahuan Privasi
@@ -311,13 +311,13 @@
             {{-- Footer Legal --}}
             <p class="mt-4 text-center text-[10px] leading-relaxed text-[#7a8499]">
                 Dengan melanjutkan, kamu menyetujui
-                <a href="https://www.traveloka.com/id-id/termsandconditions"
+                <a href="{{ route('terms') }}"
                    target="_blank" rel="noopener"
                    class="text-[#3b6fd4] underline underline-offset-2 hover:text-[#2e5bb8]">
                     Syarat &amp; Ketentuan
                 </a>
                 ini dan kamu sudah diberitahu mengenai
-                <a href="https://www.traveloka.com/id-id/privacy-notice"
+                <a href="{{ route('privacy') }}"
                    target="_blank" rel="noopener"
                    class="text-[#3b6fd4] underline underline-offset-2 hover:text-[#2e5bb8]">
                     Pemberitahuan Privasi

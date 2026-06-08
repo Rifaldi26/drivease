@@ -141,5 +141,14 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
 // Redirect halaman login/register ke home — modal akan terbuka via ?modal=login
 Route::get('login',    fn() => redirect('/?modal=login'))->name('login');
 
+// Route untuk Syarat & Ketentuan dan Kebijakan Privasi
+Route::get('/syarat-dan-ketentuan', function () {
+    return view('pages.terms');
+})->name('terms');
+
+Route::get('/kebijakan-privasi', function () {
+    return view('pages.privacy');
+})->name('privacy');
+
 // ── Breeze auth routes (login, register, dll) ─────────────────
 require __DIR__.'/auth.php';
