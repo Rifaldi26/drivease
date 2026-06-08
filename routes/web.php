@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Page;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Admin\DashboardController      as AdminDashboard;
 use App\Http\Controllers\Admin\MobilController          as AdminMobil;
@@ -143,12 +144,22 @@ Route::get('login',    fn() => redirect('/?modal=login'))->name('login');
 
 // Route untuk Syarat & Ketentuan dan Kebijakan Privasi
 Route::get('/syarat-dan-ketentuan', function () {
-    return view('pages.terms');
+    $page = Page::where('slug', 'terms')->first() ?? new Page([
+        'title'      => 'Syarat dan Ketentuan', 
+        'content'    => 'Konten belum tersedia.', 
+        'updated_at' => now()]);
+    return view('pages.terms', compact('page'));
 })->name('terms');
 
 Route::get('/kebijakan-privasi', function () {
-    return view('pages.privacy');
+    $page = Page::where('slug', 'privacy')->first() ?? new Page([
+        'title'      => 'Pemberitahuan Privasi', 
+        'content'    => 'Konten belum tersedia.', 
+        'updated_at' => now()]);
+    return view('pages.privacy', compact('page'));
 })->name('privacy');
 
 // ── Breeze auth routes (login, register, dll) ─────────────────
 require __DIR__.'/auth.php';
+
+// Menyiapkan Form di Panel Admin
