@@ -146,6 +146,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
 
 // Redirect halaman login/register ke home — modal akan terbuka via ?modal=login
 Route::get('login',    fn() => redirect('/?modal=login'))->name('login');
+Route::get('register', fn() => redirect('/?modal=register'))->name('register');
 
 // Route untuk Syarat & Ketentuan dan Kebijakan Privasi
 Route::get('/syarat-dan-ketentuan', function () {

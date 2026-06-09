@@ -34,6 +34,13 @@ $groups = [
              'active'=> request()->routeIs('admin.chat.*')],
         ],
     ],
+    [
+        'label'  => null,
+        'items' => [
+            ['route'=>'admin.pages.index','icon'=>'document-text', 'label' => 'Halaman',
+             'active'=> request()->routeIs('admin.pages.*')],
+        ],
+    ],
 ];
 @endphp
 
