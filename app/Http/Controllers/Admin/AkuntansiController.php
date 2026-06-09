@@ -145,20 +145,49 @@ class AkuntansiController extends Controller
         return back()->with('success', 'Pengeluaran berhasil dicatat.');
     }
 
-    public function export(Request $request)
-    {
-        $tahun = $request->get('tahun', now()->year);
+    // app/Http/Controllers/Admin/AkuntansiController.php
+public function export(Request $request)
+{
+    $tahun = $request->get('tahun', now()->year);
 
-        $entries = JournalEntry::with('account')
-            ->whereYear('date', $tahun)
-            ->oldest('date')
-            ->get();
+    $entries = JournalEntry::with('account')
+        ->whereYear('date', $tahun)
+        ->oldest('date')
+        ->get();
 
-        $pdf = Pdf::loadView('pdf.laporan-akuntansi', compact('entries', 'tahun'))
-            ->setPaper('a4', 'landscape');
+    // Reuse data dari method laporan()
+    $pendapatan = Account::where('tipe', 'pendapatan')
+        ->with(['journalEntries' => fn($q) => $q->whereYear('date', $tahun)])
+        ->orderBy('kode')->get()
+        ->map(fn($a) => [
+            'kode'  => $a->kode,
+            'nama'  => $a->nama,
+            'total' => $a->journalEntries->sum('credit'),
+        ]);
 
-        return $pdf->download("laporan-akuntansi-{$tahun}.pdf");
-    }
+    $pengeluaran = Account::where('tipe', 'pengeluaran')
+        ->with(['journalEntries' => fn($q) => $q->whereYear('date', $tahun)])
+        ->orderBy('kode')->get()
+        ->map(fn($a) => [
+            'kode'  => $a->kode,
+            'nama'  => $a->nama,
+            'total' => $a->journalEntries->sum('debit'),
+        ]);
+
+    $arusKas = collect(range(1, 12))->map(function ($bln) use ($tahun) {
+        $masuk  = JournalEntry::whereHas('account', fn($q) => $q->where('kode', '1-001'))
+            ->whereYear('date', $tahun)->whereMonth('date', $bln)->sum('debit');
+        $keluar = JournalEntry::whereHas('account', fn($q) => $q->where('tipe', 'pengeluaran'))
+            ->whereYear('date', $tahun)->whereMonth('date', $bln)->sum('debit');
+        return ['bulan' => $bln, 'masuk' => $masuk, 'keluar' => $keluar, 'neto' => $masuk - $keluar];
+    });
+
+    $pdf = Pdf::loadView('pdf.laporan-akuntansi', compact(
+        'entries', 'pendapatan', 'pengeluaran', 'arusKas', 'tahun'
+    ))->setPaper('a4', 'landscape');
+
+    return $pdf->download("laporan-akuntansi-{$tahun}.pdf");
+}
 
     public function edit(Account $account)
     {

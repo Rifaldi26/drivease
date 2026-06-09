@@ -38,13 +38,13 @@ class KirimEmailPemesanan implements ShouldQueue
 
         try {
             match($this->event) {
-                'dibuat'      => Mail::to($email)->send(new PemesananDibuat($this->pemesanan)),
-                'dibayar'     => $this->kirimDibayar(),
-                'dikonfirmasi'=> Mail::to($email)->send(new PemesananDikonfirmasi($this->pemesanan)),
-                'ditolak'     => Mail::to($email)->send(new PemesananDitolak($this->pemesanan)),
-                'selesai'     => Mail::to($email)->send(new PemesananSelesai($this->pemesanan)),
-                'dibatalkan'  => Mail::to($email)->send(new PemesananDibatalkan($this->pemesanan)),
-                default       => Log::warning("KirimEmailPemesanan: event tidak dikenal — {$this->event}"),
+                'dibuat'              => Mail::to($email)->send(new PemesananDibuat($this->pemesanan)),
+                'menunggu_konfirmasi' => $this->kirimMenungguKonfirmasi(), // GANTI dari 'dibayar'
+                'dikonfirmasi'        => Mail::to($email)->send(new PemesananDikonfirmasi($this->pemesanan)),
+                'ditolak'             => Mail::to($email)->send(new PemesananDitolak($this->pemesanan)),
+                'selesai'             => Mail::to($email)->send(new PemesananSelesai($this->pemesanan)),
+                'dibatalkan'          => Mail::to($email)->send(new PemesananDibatalkan($this->pemesanan)),
+                default               => Log::warning("Event tidak dikenal: {$this->event}"),
             };
 
             Log::info("Email '{$this->event}' terkirim ke {$email} untuk pemesanan #{$this->pemesanan->id}");
@@ -66,6 +66,19 @@ class KirimEmailPemesanan implements ShouldQueue
             Mail::to($admin->email)
                 ->send(new PesananBaruAdmin($this->pemesanan));
         }
+    }
+
+    private function kirimMenungguKonfirmasi(): void
+    {
+        // Email ke pelanggan
+        Mail::to($this->pemesanan->user->email)
+            ->send(new PemesananDibayar($this->pemesanan));
+    
+        // Email ke semua admin
+        User::where('role', 'admin')->each(function ($admin) {
+            Mail::to($admin->email)
+                ->send(new PesananBaruAdmin($this->pemesanan));
+        });
     }
 
     public function failed(\Throwable $exception): void

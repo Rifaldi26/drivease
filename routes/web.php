@@ -31,9 +31,6 @@ Route::get('/mobil/{mobil}', [UserMobil::class, 'show'])->name('mobil.show');
 Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
-// ── Webhook Midtrans (publik, CSRF dikecualikan di bootstrap/app.php) ──
-Route::post('payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
-
 // ══════════════════════════════════════════════════════════════
 // USER — butuh login + email verified
 // ══════════════════════════════════════════════════════════════
@@ -60,7 +57,8 @@ Route::middleware(['auth', 'verified', 'email.verified.custom'])->group(function
 
     // ── Payment ───────────────────────────────────────────────
     Route::get('/pemesanan/{pemesanan}/bayar', [PaymentController::class, 'checkout'])->name('payment.checkout');
-    Route::post('/pemesanan/{pemesanan}/snap-token', [PaymentController::class, 'snapToken'])->name('payment.snap-token');
+    Route::post('/pemesanan/{pemesanan}/pilih-metode', [PaymentController::class, 'pilihMetode'])->name('payment.pilih-metode');
+    Route::get('/pemesanan/{pemesanan}/setelah-wa', [PaymentController::class, 'setelahWa'])->name('payment.setelah-wa');
     Route::get('/pemesanan/{pemesanan}/invoice', [PaymentController::class, 'invoice'])->name('payment.invoice');
 
     // ── Favorit ───────────────────────────────────────────────
@@ -106,6 +104,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::patch('/pemesanan/{pemesanan}/konfirmasi', [AdminPemesanan::class, 'konfirmasi'])->name('pemesanan.konfirmasi');
     Route::patch('/pemesanan/{pemesanan}/tolak', [AdminPemesanan::class, 'tolak'])->name('pemesanan.tolak');
     Route::patch('/pemesanan/{pemesanan}/selesai', [AdminPemesanan::class, 'selesai'])->name('pemesanan.selesai');
+    Route::patch('/pemesanan/{pemesanan}/konfirmasi-bayar', [AdminPemesanan::class, 'konfirmasiPembayaran'])->name('pemesanan.konfirmasi-bayar');
     Route::get('/pemesanan/{pemesanan}/invoice', [AdminPemesanan::class, 'invoice'])->name('pemesanan.invoice');
 
     // ── Manajemen User ────────────────────────────────────────

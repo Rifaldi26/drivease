@@ -111,10 +111,48 @@ class PemesananController extends Controller
             route('pemesanan.index')
         );
 
+        
+
         // Email async
         KirimEmailPemesanan::dispatch($pemesanan, 'selesai');
 
         return back()->with('success', 'Pemesanan ditandai selesai.');
+    }
+
+    // Tambahkan setelah method selesai()
+
+    public function konfirmasiPembayaran(Pemesanan $pemesanan)
+    {
+        if (!$pemesanan->payment) {
+            return back()->with('error', 'Tidak ada data pembayaran untuk pemesanan ini.');
+        }
+    
+        if ($pemesanan->payment->status === 'dikonfirmasi') {
+            return back()->with('info', 'Pembayaran sudah dikonfirmasi sebelumnya.');
+        }
+    
+        $pemesanan->payment->update([
+            'status'  => 'dikonfirmasi',
+            'paid_at' => now(),
+        ]);
+    
+        // Lanjut konfirmasi pemesanan jika belum
+        if ($pemesanan->status === 'menunggu_konfirmasi_admin') {
+            $pemesanan->update(['status' => 'dikonfirmasi']);
+            $pemesanan->mobil->update(['status' => 'disewa']);
+    
+            Notifikasi::kirim(
+                $pemesanan->user_id,
+                'Pemesanan Dikonfirmasi',
+                "Pemesanan #{$pemesanan->id} untuk {$pemesanan->mobil->nama} telah dikonfirmasi.",
+                'success',
+                route('pemesanan.show', $pemesanan)
+            );
+    
+            KirimEmailPemesanan::dispatch($pemesanan->fresh(['user', 'mobil', 'payment']), 'dikonfirmasi');
+        }
+    
+        return back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
     }
 
     public function invoice(Pemesanan $pemesanan)
