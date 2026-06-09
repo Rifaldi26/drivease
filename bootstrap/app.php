@@ -12,16 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        
+        $middleware->web(append: [
+                \App\Http\Middleware\SetLocale::class,
+        ]);
 
         // Alias middleware
         $middleware->alias([
             'is_admin'             => \App\Http\Middleware\IsAdmin::class,
             'email.verified.custom'=> \App\Http\Middleware\EnsureEmailVerified::class,
-        ]);
-
-        // Kecualikan webhook Midtrans dari CSRF
-        $middleware->validateCsrfTokens(except: [
-            'payment/webhook',
         ]);
 
     })

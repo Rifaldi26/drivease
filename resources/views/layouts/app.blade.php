@@ -11,7 +11,7 @@
     @stack('styles')
 </head>
 <body class="min-h-screen bg-[#f4f6fb] font-inter antialiased"
-      x-data="{ drawerOpen: false, lang: localStorage.getItem('de_lang') || 'id' }">
+      x-data="{ drawerOpen: false, lang: '{{ app()->getLocale() }}' }">
 
     {{-- ── Navbar ──────────────────────────────────────────── --}}
     <header class="sticky top-0 z-40 border-b border-[#e5e9f2] bg-white/95 backdrop-blur">
@@ -64,14 +64,26 @@
             {{-- Right --}}
             <div class="ml-auto flex items-center gap-2">
 
-                {{-- Lang Toggle --}}
-                <button @click="lang = lang==='id'?'en':'id'; localStorage.setItem('de_lang',lang)"
-                        class="inline-flex items-center gap-1 rounded-lg border border-[#e5e9f2]
-                               bg-white px-2.5 py-1.5 text-xs font-semibold hover:bg-[#f1f4fa] transition-colors">
-                    <span :class="lang==='id'?'text-[#3b6fd4]':'text-[#7a8499]'">ID</span>
-                    <span class="text-[#c8d0e0]">|</span>
-                    <span :class="lang==='en'?'text-[#3b6fd4]':'text-[#7a8499]'">EN</span>
-                </button>
+                {{-- Lang Toggle menggunakan Alpine.js --}}
+                <div class="inline-flex items-center gap-0.5 rounded-lg border border-[#e5e9f2] bg-white p-1 text-xs font-semibold">
+                    
+                    {{-- Tombol ID --}}
+                    <button @click="lang = 'id'; window.location.href = '{{ route('lang.switch', 'id') }}'"
+                            :class="lang === 'id' ? 'bg-[#eef2fb] text-[#3b6fd4]' : 'text-[#7a8499] hover:bg-[#f1f4fa] hover:text-[#18213a]'"
+                            class="rounded px-2 py-1 transition-colors">
+                        ID
+                    </button>
+                    
+                    <span class="text-[#c8d0e0] mx-0.5">|</span>
+                    
+                    {{-- Tombol EN --}}
+                    <button @click="lang = 'en'; window.location.href = '{{ route('lang.switch', 'en') }}'"
+                            :class="lang === 'en' ? 'bg-[#eef2fb] text-[#3b6fd4]' : 'text-[#7a8499] hover:bg-[#f1f4fa] hover:text-[#18213a]'"
+                            class="rounded px-2 py-1 transition-colors">
+                        EN
+                    </button>
+                
+                </div>
 
                 @auth
                     {{-- Notifikasi --}}

@@ -20,6 +20,16 @@ use App\Http\Controllers\User\NotifikasiController      as UserNotifikasi;
 use App\Http\Controllers\User\ChatController            as UserChat;
 use App\Http\Controllers\User\ProfilController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
+
+Route::get('/lang/{locale}', function ($locale) {
+    // Cek apakah bahasa yang dipilih diizinkan (id atau en)
+    if (in_array($locale, ['id', 'en'])) {
+        Session::put('locale', $locale);
+    }
+    return redirect()->back(); // Kembalikan user ke halaman sebelumnya
+})->name('lang.switch');
 
 // ══════════════════════════════════════════════════════════════
 // PUBLIC — tidak butuh login
