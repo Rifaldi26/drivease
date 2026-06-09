@@ -117,21 +117,30 @@ class PaymentController extends Controller
         $template = config("payment.wa_template.{$metode}", '');
         $config   = config("payment.metode.{$metode}", []);
 
+        // Info waktu untuk sewa 12 jam
+        $waktuInfo = $pemesanan->adalah12Jam() && $pemesanan->waktu_mulai
+            ? ' pukul ' . substr($pemesanan->waktu_mulai, 0, 5)
+            : '';
+
+        // Label durasi yang mudah dibaca
+        $labelDurasi = $pemesanan->adalah12Jam()
+            ? 'Sewa 12 Jam'
+            : 'Sewa ' . $pemesanan->durasi() . ' Hari';
+
         $pesan = strtr($template, [
-            '{id}'              => $pemesanan->id,
-            '{nama}'            => $pemesanan->user->name,
-            '{mobil}'           => $pemesanan->mobil->nama,
-            '{tanggal_mulai}'   => $pemesanan->tanggal_mulai->format('d M Y'),
-            '{tanggal_selesai}' => $pemesanan->tanggal_selesai->format('d M Y'),
-            '{durasi}'          => $pemesanan->durasi(),
-            '{total}'           => number_format($pemesanan->total_harga, 0, ',', '.'),
-            '{bank}'            => $config['bank'] ?? '',
-            '{rekening}'        => $config['rekening'] ?? '',
-            '{atas_nama}'       => $config['atas_nama'] ?? '',
+            '{id}'            => $pemesanan->id,
+            '{nama}'          => $pemesanan->user->name,
+            '{mobil}'         => $pemesanan->mobil->nama,
+            '{durasi}'        => $labelDurasi,
+            '{tanggal_mulai}' => $pemesanan->tanggal_mulai->format('d M Y'),
+            '{waktu_info}'    => $waktuInfo,
+            '{total}'         => number_format($pemesanan->total_harga, 0, ',', '.'),
+            '{bank}'          => $config['bank']      ?? '',
+            '{rekening}'      => $config['rekening']  ?? '',
+            '{atas_nama}'     => $config['atas_nama'] ?? '',
         ]);
 
-        $nomor = config('payment.wa_number');
-
-        return 'https://wa.me/' . $nomor . '?text=' . rawurlencode($pesan);
+        return 'https://wa.me/c/6285728015695' . config('payment.wa_number')
+            . '?text=' . rawurlencode($pesan);
     }
 }
