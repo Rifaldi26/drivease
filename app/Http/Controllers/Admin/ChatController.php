@@ -20,7 +20,7 @@ class ChatController extends Controller
         $userIds = Pesan::where('pengirim_id', $adminId)
             ->orWhere('penerima_id', $adminId)
             ->get(['pengirim_id', 'penerima_id'])
-            ->flatten()
+            ->flatMap(fn($p) => [$p->pengirim_id, $p->penerima_id])  // ← flat array of IDs
             ->unique()
             ->filter(fn($id) => $id !== $adminId)
             ->values();
