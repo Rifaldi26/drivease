@@ -133,6 +133,7 @@ class PaymentController extends Controller
             '{mobil}'         => $pemesanan->mobil->nama,
             '{durasi}'        => $labelDurasi,
             '{tanggal_mulai}' => $pemesanan->tanggal_mulai->format('d M Y'),
+            '{tanggal_selesai}' => $pemesanan->tanggal_selesai->format('d M Y'),
             '{waktu_info}'    => $waktuInfo,
             '{total}'         => number_format($pemesanan->total_harga, 0, ',', '.'),
             '{bank}'          => $config['bank']      ?? '',
@@ -140,7 +141,7 @@ class PaymentController extends Controller
             '{atas_nama}'     => $config['atas_nama'] ?? '',
         ]);
 
-        return 'https://wa.me/c/6285728015695' . config('payment.wa_number')
+        return 'https://wa.me/' . config('payment.wa_number')
             . '?text=' . rawurlencode($pesan);
     }
 }

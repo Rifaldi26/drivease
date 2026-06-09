@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     | Format: 62xxxxxxxxxx (tanpa + dan spasi)
     */
-    'wa_number' => env('PAYMENT_WA_NUMBER', '6281234567890'),
+    'wa_number' => env('PAYMENT_WA_NUMBER', '6285728015695'),
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ return [
             "📋 ID Pemesanan : #{id}",
             "👤 Nama          : {nama}",
             "🚗 Kendaraan     : {mobil}",
-            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi} hari)",
+            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi})",
             "💰 Total Tagihan : Rp {total}",
             "━━━━━━━━━━━━━━━━━━━━",
             "💵 Metode Bayar  : *CASH*",
@@ -78,7 +78,7 @@ return [
             "📋 ID Pemesanan : #{id}",
             "👤 Nama          : {nama}",
             "🚗 Kendaraan     : {mobil}",
-            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi} hari)",
+            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi})",
             "💰 Total Tagihan : Rp {total}",
             "━━━━━━━━━━━━━━━━━━━━",
             "🏦 Metode Bayar  : *TRANSFER {bank}*",
@@ -95,7 +95,7 @@ return [
             "📋 ID Pemesanan : #{id}",
             "👤 Nama          : {nama}",
             "🚗 Kendaraan     : {mobil}",
-            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi} hari)",
+            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi})",
             "💰 Total Tagihan : Rp {total}",
             "━━━━━━━━━━━━━━━━━━━━",
             "📱 Metode Bayar  : *QRIS*",
@@ -111,7 +111,7 @@ return [
             "📋 ID Pemesanan : #{id}",
             "👤 Nama          : {nama}",
             "🚗 Kendaraan     : {mobil}",
-            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi} hari)",
+            "📅 Tanggal       : {tanggal_mulai} s/d {tanggal_selesai} ({durasi})",
             "💰 Total Tagihan : Rp {total}",
             "━━━━━━━━━━━━━━━━━━━━",
             "💳 Metode Bayar  : *EDC / KARTU*",

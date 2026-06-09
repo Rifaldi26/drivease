@@ -97,7 +97,7 @@
                     <x-icon name="eye" class="w-4 h-4" />
                     Pantau Status Pemesanan
                 </a>
-                <a href="{{ 'https://wa.me/c/6285728015695' . config('payment.wa_number') }}"
+                <a href="{{ 'https://wa.me/' . config('payment.wa_number') }}"
                    target="_blank"
                    class="flex items-center justify-center gap-2 rounded-xl border border-[#e5e9f2]
                           py-2.5 text-sm font-medium text-[#18213a] hover:bg-[#f4f6fb] transition-colors">

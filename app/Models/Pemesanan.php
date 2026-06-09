@@ -116,6 +116,11 @@ class Pemesanan extends Model
                      ->whereYear('created_at', $tahun);
     }
 
+    public function adalah12Jam(): bool
+    {
+        return $this->durasi() === 0 || $this->durasi() < 1;
+    }
+
     // Cek apakah ada konflik tanggal untuk mobil tertentu
     public static function adaKonflik(int $mobilId, string $mulai, string $selesai, ?int $excludeId = null): bool
     {
