@@ -12,6 +12,7 @@ class Mobil extends Model
         'tahun',
         'plat_nomor',
         'harga_per_hari',
+        'harga_12jam',
         'biaya_supir_per_hari',
         'status',
         'foto',
@@ -19,8 +20,9 @@ class Mobil extends Model
     ];
 
     protected $casts = [
-        'harga_per_hari'      => 'decimal:2',
-        'biaya_supir_per_hari'=> 'decimal:2',
+        'harga_per_hari'       => 'decimal:2',
+        'harga_12jam'          => 'decimal:2',
+        'biaya_supir_per_hari' => 'decimal:2',
     ];
 
     // ── Helpers ───────────────────────────────────────────
@@ -32,6 +34,34 @@ class Mobil extends Model
     public function adaSupir(): bool
     {
         return !is_null($this->biaya_supir_per_hari);
+    }
+
+    public function ada12Jam(): bool
+    {
+        return ! is_null($this->harga_12jam);
+    }
+
+    public function hargaUntuk(string $durasi, bool $denganSupir = false): float
+    {
+        $hargaPokok = match($durasi) {
+            '12jam' => (float) ($this->harga_12jam ?? $this->harga_per_hari),
+            default => (float) $this->harga_per_hari,
+        };
+
+        $hargaSupir = $denganSupir && $this->adaSupir()
+            ? (float) $this->biaya_supir_per_hari
+            : 0;
+
+        return $hargaPokok + $hargaSupir;
+    }
+
+    public function hargaMulaiDari(): float
+    {
+        if ($this->ada12Jam()) {
+            return min((float) $this->harga_12jam, (float) $this->harga_per_hari);
+        }
+
+        return (float) $this->harga_per_hari;
     }
 
     public function fotoUrl(): string

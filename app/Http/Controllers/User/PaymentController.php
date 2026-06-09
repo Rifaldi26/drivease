@@ -128,17 +128,17 @@ class PaymentController extends Controller
             : 'Sewa ' . $pemesanan->durasi() . ' Hari';
 
         $pesan = strtr($template, [
-            '{id}'            => $pemesanan->id,
-            '{nama}'          => $pemesanan->user->name,
-            '{mobil}'         => $pemesanan->mobil->nama,
-            '{durasi}'        => $labelDurasi,
-            '{tanggal_mulai}' => $pemesanan->tanggal_mulai->format('d M Y'),
+            '{id}'              => $pemesanan->id,
+            '{nama}'            => $pemesanan->user->name,
+            '{mobil}'           => $pemesanan->mobil->nama,
+            '{durasi}'          => $labelDurasi,
+            '{tanggal_mulai}'   => $pemesanan->tanggal_mulai->format('d M Y'),
             '{tanggal_selesai}' => $pemesanan->tanggal_selesai->format('d M Y'),
-            '{waktu_info}'    => $waktuInfo,
-            '{total}'         => number_format($pemesanan->total_harga, 0, ',', '.'),
-            '{bank}'          => $config['bank']      ?? '',
-            '{rekening}'      => $config['rekening']  ?? '',
-            '{atas_nama}'     => $config['atas_nama'] ?? '',
+            '{waktu_info}'      => $waktuInfo,
+            '{total}'           => number_format($pemesanan->total_harga, 0, ',', '.'),
+            '{bank}'            => $config['bank']      ?? '',
+            '{rekening}'        => $config['rekening']  ?? '',
+            '{atas_nama}'       => $config['atas_nama'] ?? '',
         ]);
 
         return 'https://wa.me/' . config('payment.wa_number')
