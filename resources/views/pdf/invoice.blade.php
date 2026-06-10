@@ -192,8 +192,14 @@ body {
         <div class="info-box">
             <div class="info-box-title">Detail Pemesanan</div>
             <div class="info-box-name">{{ $pemesanan->mobil->nama }}</div>
-            <div class="info-box-sub">{{ $pemesanan->mobil->merek }} &bull; {{ $pemesanan->mobil->tahun }}</div>
+            <div class="info-box-sub">
+                {{ $pemesanan->mobil->merek }} &bull; {{ $pemesanan->mobil->tahun }}
+            </div>
             <div class="info-box-sub font-mono">{{ $pemesanan->mobil->plat_nomor }}</div>
+            <div class="info-box-sub" style="margin-top:6px; font-weight:600;">
+                {{ $pemesanan->labelDurasi() }}
+                &bull; {{ $pemesanan->opsi_supir ? 'Dengan Supir' : 'Self-Drive' }}
+            </div>
         </div>
     </div>
 
@@ -211,52 +217,104 @@ body {
         <tbody>
             <tr>
                 <td>
-                    <strong>Sewa {{ $pemesanan->mobil->nama }}</strong><br>
-                    <span class="text-muted" style="font-size:10px;">Self-Drive</span>
+                    @if($pemesanan->adalah12Jam())
+                        <strong>Sewa 12 Jam — {{ $pemesanan->mobil->nama }}</strong><br>
+                        <span class="text-muted" style="font-size:10px;">
+                            1 sesi &bull; {{ $pemesanan->opsi_supir ? 'Dengan Supir' : 'Self-Drive' }}
+                        </span>
+                    @else
+                        <strong>Sewa Harian — {{ $pemesanan->mobil->nama }}</strong><br>
+                        <span class="text-muted" style="font-size:10px;">
+                            {{ $pemesanan->opsi_supir ? 'Dengan Supir' : 'Self-Drive' }}
+                        </span>
+                    @endif
                 </td>
                 <td style="font-size:10px;">
-                    {{ $pemesanan->tanggal_mulai->format('d M Y') }}<br>
-                    s/d {{ $pemesanan->tanggal_selesai->format('d M Y') }}
+                    @if($pemesanan->adalah12Jam())
+                        {{ $pemesanan->tanggal_mulai->format('d M Y') }}<br>
+                        @if($pemesanan->waktu_mulai)
+                            Pukul {{ substr($pemesanan->waktu_mulai, 0, 5) }}
+                        @endif
+                    @else
+                        {{ $pemesanan->tanggal_mulai->format('d M Y') }}<br>
+                        s/d {{ $pemesanan->tanggal_selesai->format('d M Y') }}
+                    @endif
                 </td>
-                <td>{{ $pemesanan->durasi() }} hari</td>
-                <td>Rp {{ number_format($pemesanan->mobil->harga_per_hari, 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($pemesanan->durasi() * $pemesanan->mobil->harga_per_hari, 0, ',', '.') }}</td>
+                <td>
+                    {{ $pemesanan->durasi() }} {{ $pemesanan->labelSatuan() }}
+                </td>
+                <td>
+                    Rp {{ number_format($pemesanan->hargaPokok(), 0, ',', '.') }}
+                </td>
+                <td>
+                    Rp {{ number_format(
+                        $pemesanan->hargaPokok() * $pemesanan->durasi(),
+                        0, ',', '.'
+                    ) }}
+                </td>
             </tr>
 
             @if($pemesanan->opsi_supir && $pemesanan->biaya_supir)
             <tr>
                 <td>
                     <strong>Jasa Supir</strong><br>
-                    <span class="text-muted" style="font-size:10px;">Layanan supir profesional</span>
+                    <span class="text-muted" style="font-size:10px;">
+                        Layanan supir profesional
+                    </span>
                 </td>
                 <td style="font-size:10px;">
-                    {{ $pemesanan->tanggal_mulai->format('d M Y') }}<br>
-                    s/d {{ $pemesanan->tanggal_selesai->format('d M Y') }}
+                    @if($pemesanan->adalah12Jam())
+                        {{ $pemesanan->tanggal_mulai->format('d M Y') }}
+                    @else
+                        {{ $pemesanan->tanggal_mulai->format('d M Y') }}<br>
+                        s/d {{ $pemesanan->tanggal_selesai->format('d M Y') }}
+                    @endif
                 </td>
-                <td>{{ $pemesanan->durasi() }} hari</td>
-                <td>Rp {{ number_format($pemesanan->mobil->biaya_supir_per_hari, 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($pemesanan->biaya_supir, 0, ',', '.') }}</td>
+                <td>
+                    {{ $pemesanan->durasi() }} {{ $pemesanan->labelSatuan() }}
+                </td>
+                <td>
+                    Rp {{ number_format(
+                        $pemesanan->biaya_supir / $pemesanan->durasi(),
+                        0, ',', '.'
+                    ) }}
+                </td>
+                <td>
+                    Rp {{ number_format($pemesanan->biaya_supir, 0, ',', '.') }}
+                </td>
             </tr>
             @endif
         </tbody>
+
         <tfoot>
             @php
-                $biayaSewa  = $pemesanan->durasi() * $pemesanan->mobil->harga_per_hari;
-                $biayaSupir = $pemesanan->biaya_supir ?? 0;
+                $subtotalSewa  = $pemesanan->hargaPokok() * $pemesanan->durasi();
+                $subtotalSupir = $pemesanan->biaya_supir ?? 0;
             @endphp
+
             <tr class="subtotal">
-                <td colspan="4" class="text-right text-muted">Subtotal Sewa</td>
-                <td class="text-right text-muted">Rp {{ number_format($biayaSewa, 0, ',', '.') }}</td>
+                <td colspan="4" class="text-right text-muted">
+                    Subtotal Sewa ({{ $pemesanan->labelDurasi() }})
+                </td>
+                <td class="text-right text-muted">
+                    Rp {{ number_format($subtotalSewa, 0, ',', '.') }}
+                </td>
             </tr>
-            @if($biayaSupir > 0)
+
+            @if($subtotalSupir > 0)
             <tr class="subtotal">
                 <td colspan="4" class="text-right text-muted">Subtotal Supir</td>
-                <td class="text-right text-muted">Rp {{ number_format($biayaSupir, 0, ',', '.') }}</td>
+                <td class="text-right text-muted">
+                    Rp {{ number_format($subtotalSupir, 0, ',', '.') }}
+                </td>
             </tr>
             @endif
+
             <tr class="total-row">
                 <td colspan="4" class="text-right">Total Pembayaran</td>
-                <td class="text-right">Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}</td>
+                <td class="text-right">
+                    Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}
+                </td>
             </tr>
         </tfoot>
     </table>

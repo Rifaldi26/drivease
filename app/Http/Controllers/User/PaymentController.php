@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    // ── Halaman pilih metode pembayaran ────────────────────
+    // ── Halaman pilih metode pembayaran ──────────────────────────────────
+
     public function checkout(Pemesanan $pemesanan)
     {
         abort_if($pemesanan->user_id !== Auth::id(), 403);
 
-        if ($pemesanan->status !== 'pending') {
+        if (! $pemesanan->isPending()) {
             return redirect()->route('pemesanan.show', $pemesanan)
                 ->with('info', 'Pemesanan ini tidak memerlukan pembayaran.');
         }
@@ -30,21 +31,21 @@ class PaymentController extends Controller
         return view('user.payment.checkout', compact('pemesanan', 'metode'));
     }
 
-    // ── Proses pilihan metode → simpan Payment → redirect WA ─
+    // ── Proses pilihan metode → simpan Payment → redirect WA ────────────
+
     public function pilihMetode(Request $request, Pemesanan $pemesanan)
     {
         abort_if($pemesanan->user_id !== Auth::id(), 403);
 
         $request->validate([
-            'metode' => 'required|in:cash,transfer,qris,edc',
+            'metode' => ['required', 'in:' . implode(',', array_keys(config('payment.metode', [])))],
         ]);
 
-        if ($pemesanan->status !== 'pending') {
+        if (! $pemesanan->isPending()) {
             return back()->with('error', 'Pemesanan sudah tidak dalam status pending.');
         }
 
-        // Buat atau update payment record
-        $payment = Payment::updateOrCreate(
+        Payment::updateOrCreate(
             ['pemesanan_id' => $pemesanan->id],
             [
                 'amount'     => $pemesanan->total_harga,
@@ -54,94 +55,93 @@ class PaymentController extends Controller
             ]
         );
 
-        // Update status pemesanan
-        $pemesanan->update(['status' => 'menunggu_konfirmasi_admin']);
+        $pemesanan->update(['status' => Pemesanan::STATUS_MENUNGGU_KONFIRMASI_ADMIN]);
 
-        // Notifikasi in-app ke pelanggan
+        // Notifikasi in-app → pelanggan
         Notifikasi::kirim(
-            Auth::id(),
-            'Menunggu Konfirmasi',
-            "Pemesanan #{$pemesanan->id} sedang menunggu konfirmasi admin setelah kamu mengirim pesan WhatsApp.",
-            'info',
-            route('pemesanan.show', $pemesanan)
+            userId : Auth::id(),
+            judul  : 'Menunggu Konfirmasi',
+            pesan  : "Pemesanan #{$pemesanan->id} sedang menunggu konfirmasi admin "
+                     . 'setelah Anda mengirim pesan WhatsApp.',
+            tipe   : 'info',
+            link   : route('pemesanan.show', $pemesanan),
         );
 
-        // Notifikasi in-app ke semua admin
-        User::where('role', 'admin')->each(function ($admin) use ($pemesanan) {
+        // Notifikasi in-app → semua admin
+        $pemesanan->load(['user', 'mobil', 'payment']);
+        User::where('role', 'admin')->each(function (User $admin) use ($pemesanan) {
             Notifikasi::kirim(
-                $admin->id,
-                'Pesanan Baru via WhatsApp',
-                "Pemesanan #{$pemesanan->id} dari {$pemesanan->user->name} memilih metode {$pemesanan->payment->labelMetode()}. Cek WhatsApp.",
-                'info',
-                route('admin.pemesanan.show', $pemesanan)
+                userId : $admin->id,
+                judul  : 'Pesanan Baru via WhatsApp',
+                pesan  : "Pemesanan #{$pemesanan->id} dari {$pemesanan->user->name} "
+                         . "memilih metode {$pemesanan->payment->labelMetode()}. Cek WhatsApp.",
+                tipe   : 'info',
+                link   : route('admin.pemesanan.show', $pemesanan),
             );
         });
 
         // Email async
         KirimEmailPemesanan::dispatch($pemesanan->fresh(['user', 'mobil', 'payment']), 'menunggu_konfirmasi');
 
-        // Build WhatsApp URL
-        $waUrl = $this->buildWhatsAppUrl($pemesanan, $request->metode);
-
-        return redirect()->away($waUrl);
+        return redirect()->away($this->buildWhatsAppUrl($pemesanan, $request->metode));
     }
 
-    // ── Halaman konfirmasi setelah redirect balik dari WA ───
+    // ── Halaman konfirmasi setelah kembali dari WhatsApp ─────────────────
+
     public function setelahWa(Pemesanan $pemesanan)
     {
         abort_if($pemesanan->user_id !== Auth::id(), 403);
         $pemesanan->load(['mobil', 'payment']);
+
         return view('user.payment.setelah-wa', compact('pemesanan'));
     }
 
-    // ── Download Invoice PDF ────────────────────────────────
+    // ── Download Invoice PDF ─────────────────────────────────────────────
+
     public function invoice(Pemesanan $pemesanan)
     {
         abort_if($pemesanan->user_id !== Auth::id(), 403);
-        abort_unless(
-            in_array($pemesanan->status, ['menunggu_konfirmasi_admin', 'dikonfirmasi', 'selesai']),
-            403
-        );
+
+        // Invoice hanya tersedia untuk pemesanan yang sudah melewati tahap pembayaran
+        $statusDiizinkan = [
+            Pemesanan::STATUS_MENUNGGU_KONFIRMASI_ADMIN,
+            Pemesanan::STATUS_DIKONFIRMASI,
+            Pemesanan::STATUS_SELESAI,
+        ];
+
+        abort_unless(in_array($pemesanan->status, $statusDiizinkan, strict: true), 403);
 
         $pemesanan->load(['mobil', 'user', 'payment']);
 
-        $pdf = Pdf::loadView('pdf.invoice', compact('pemesanan'))
-            ->setPaper('a4');
+        $pdf = Pdf::loadView('pdf.invoice', compact('pemesanan'))->setPaper('a4');
 
         return $pdf->download("invoice-drivease-{$pemesanan->id}.pdf");
     }
 
-    // ── Private: Build URL WhatsApp ─────────────────────────
+    // ── Private ──────────────────────────────────────────────────────────
+
+    /**
+     * Bangun URL WhatsApp dengan teks pesan terisi otomatis.
+     * Template dan nomor admin diambil dari config/payment.php.
+     */
     private function buildWhatsAppUrl(Pemesanan $pemesanan, string $metode): string
     {
         $template = config("payment.wa_template.{$metode}", '');
         $config   = config("payment.metode.{$metode}", []);
 
-        // Info waktu untuk sewa 12 jam
-        $waktuInfo = $pemesanan->adalah12Jam() && $pemesanan->waktu_mulai
-            ? ' pukul ' . substr($pemesanan->waktu_mulai, 0, 5)
-            : '';
-
-        // Label durasi yang mudah dibaca
-        $labelDurasi = $pemesanan->adalah12Jam()
-            ? 'Sewa 12 Jam'
-            : 'Sewa ' . $pemesanan->durasi() . ' Hari';
-
         $pesan = strtr($template, [
             '{id}'              => $pemesanan->id,
             '{nama}'            => $pemesanan->user->name,
             '{mobil}'           => $pemesanan->mobil->nama,
-            '{durasi}'          => $labelDurasi,
-            '{tanggal_mulai}'   => $pemesanan->tanggal_mulai->format('d M Y'),
-            '{tanggal_selesai}' => $pemesanan->tanggal_selesai->format('d M Y'),
-            '{waktu_info}'      => $waktuInfo,
+            '{tanggal_mulai}'   => $pemesanan->tanggal_mulai->isoFormat('D MMM Y'),
+            '{tanggal_selesai}' => $pemesanan->tanggal_selesai->isoFormat('D MMM Y'),
+            '{durasi}'          => $pemesanan->durasi(),
             '{total}'           => number_format($pemesanan->total_harga, 0, ',', '.'),
             '{bank}'            => $config['bank']      ?? '',
             '{rekening}'        => $config['rekening']  ?? '',
             '{atas_nama}'       => $config['atas_nama'] ?? '',
         ]);
 
-        return 'https://wa.me/' . config('payment.wa_number')
-            . '?text=' . rawurlencode($pesan);
+        return 'https://wa.me/' . config('payment.wa_number') . '?text=' . rawurlencode($pesan);
     }
 }
