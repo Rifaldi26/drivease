@@ -3,42 +3,42 @@ $groups = [
     [
         'label' => null,
         'items' => [
-            ['route'=>'admin.dashboard','icon'=>'chart-bar','label'=>'Beranda',
-             'active'=> request()->routeIs('admin.dashboard')],
+            ['route' => 'admin.dashboard', 'icon' => 'chart-bar', 'label' => 'Beranda',
+             'active' => request()->routeIs('admin.dashboard')],
         ],
     ],
     [
         'label' => 'Operasional',
         'items' => [
-            ['route'=>'admin.pemesanan.index','icon'=>'calendar','label'=>'Pemesanan',
-             'active'=> request()->routeIs('admin.pemesanan.*')],
-            ['route'=>'admin.mobil.index',   'icon'=>'car',     'label'=>'Armada Mobil',
-             'active'=> request()->routeIs('admin.mobil.*')],
-            ['route'=>'admin.user.index',    'icon'=>'users',   'label'=>'Pengguna',
-             'active'=> request()->routeIs('admin.user.*')],
+            ['route' => 'admin.pemesanan.index', 'icon' => 'calendar',  'label' => 'Pemesanan',
+             'active' => request()->routeIs('admin.pemesanan.*')],
+            ['route' => 'admin.mobil.index',     'icon' => 'car',       'label' => 'Armada Mobil',
+             'active' => request()->routeIs('admin.mobil.*')],
+            ['route' => 'admin.user.index',      'icon' => 'users',     'label' => 'Pengguna',
+             'active' => request()->routeIs('admin.user.*')],
         ],
     ],
     [
         'label' => 'Keuangan',
         'items' => [
-            ['route'=>'admin.laporan.index',  'icon'=>'trending-up','label'=>'Laporan',
-             'active'=> request()->routeIs('admin.laporan.*')],
-            ['route'=>'admin.akuntansi.index','icon'=>'book-open', 'label'=>'Akuntansi',
-             'active'=> request()->routeIs('admin.akuntansi.*')],
+            ['route' => 'admin.laporan.index',   'icon' => 'trending-up', 'label' => 'Laporan',
+             'active' => request()->routeIs('admin.laporan.*')],
+            ['route' => 'admin.akuntansi.index', 'icon' => 'book-open',   'label' => 'Akuntansi',
+             'active' => request()->routeIs('admin.akuntansi.*')],
         ],
     ],
     [
-        'label'  => null,
+        'label' => null,
         'items' => [
-            ['route'=>'admin.chat.index','icon'=>'chat', 'label'  => 'Chat',
-             'active'=> request()->routeIs('admin.chat.*')],
+            ['route' => 'admin.chat.index', 'icon' => 'chat', 'label' => 'Chat',
+             'active' => request()->routeIs('admin.chat.*')],
         ],
     ],
     [
-        'label'  => null,
+        'label' => 'Pengaturan',
         'items' => [
-            ['route'=>'admin.pages.index','icon'=>'document-text', 'label' => 'Halaman',
-             'active'=> request()->routeIs('admin.pages.*')],
+            ['route' => 'admin.pages.index', 'icon' => 'document-text', 'label' => 'Halaman Statis',
+             'active' => request()->routeIs('admin.pages.*')],
         ],
     ],
 ];
@@ -63,15 +63,15 @@ $groups = [
 
 {{-- Nav Groups --}}
 <nav class="space-y-5 p-3">
-    @foreach($groups as $group)
+    @foreach ($groups as $group)
         <div>
-            @if($group['label'])
+            @if ($group['label'])
                 <p class="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
                     {{ $group['label'] }}
                 </p>
             @endif
             <div class="space-y-0.5">
-                @foreach($group['items'] as $item)
+                @foreach ($group['items'] as $item)
                     <a href="{{ route($item['route']) }}"
                        @click="drawerOpen = false"
                        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium
@@ -86,3 +86,4 @@ $groups = [
             </div>
         </div>
     @endforeach
+</nav>

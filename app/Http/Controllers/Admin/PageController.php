@@ -3,37 +3,52 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdatePageRequest;
 use App\Models\Page;
-use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    // Menampilkan daftar halaman yang bisa diedit
+    /**
+     * Tampilkan daftar semua halaman statis yang dapat diedit.
+     */
     public function index()
     {
-        $pages = Page::all();
+        $pages = Page::orderBy('slug')->get();
+
         return view('admin.pages.index', compact('pages'));
     }
 
-    // Menampilkan form editor WYSIWYG
-    public function edit($slug)
+    /**
+     * Tampilkan form editor untuk satu halaman.
+     */
+    public function edit(string $slug)
     {
-        $page = Page::where('slug', $slug)->firstOrFail();
-        return view('admin.pages.edit', compact('page'));
+        $page    = Page::where('slug', $slug)->firstOrFail();
+        $content = rescue(
+            fn () => json_decode($page->content, associative: true, flags: JSON_THROW_ON_ERROR),
+            ['sections' => []],
+        );
+
+        return view('admin.pages.edit', compact('page', 'content'));
     }
 
-    // Menyimpan perubahan ke database
-    public function update(Request $request, $slug)
+    /**
+     * Simpan perubahan halaman ke database.
+     */
+    public function update(UpdatePageRequest $request, string $slug)
     {
         $page = Page::where('slug', $slug)->firstOrFail();
-    
-        $content = ['sections' => $request->input('sections', [])];
-    
+
         $page->update([
-            'title'   => $request->title,
-            'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
+            'title'   => $request->validated('title'),
+            'content' => json_encode(
+                ['sections' => $request->validated('sections', [])],
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+            ),
         ]);
-    
-        return redirect()->route('admin.pages.index')->with('success', 'Halaman berhasil diperbarui.');
+
+        return redirect()
+            ->route('admin.pages.index')
+            ->with('success', "\"{$page->title}\" berhasil diperbarui.");
     }
 }

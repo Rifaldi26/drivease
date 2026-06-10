@@ -1,7 +1,7 @@
 @php
 $groups = [
     [
-        'label' => 'Beranda',
+        'label'  => 'Beranda',
         'single' => true,
         'route'  => 'admin.dashboard',
         'icon'   => 'chart-bar',
@@ -10,41 +10,42 @@ $groups = [
     [
         'label'  => 'Operasional',
         'single' => false,
-        'active' => request()->routeIs('admin.pemesanan.*','admin.mobil.*','admin.user.*'),
+        'active' => request()->routeIs('admin.pemesanan.*', 'admin.mobil.*', 'admin.user.*'),
         'items'  => [
-            ['route'=>'admin.pemesanan.index','icon'=>'calendar','label'=>'Pemesanan'],
-            ['route'=>'admin.mobil.index',    'icon'=>'car',     'label'=>'Armada Mobil'],
-            ['route'=>'admin.user.index',     'icon'=>'users',   'label'=>'Pengguna'],
+            ['route' => 'admin.pemesanan.index', 'icon' => 'calendar',     'label' => 'Pemesanan'],
+            ['route' => 'admin.mobil.index',     'icon' => 'car',          'label' => 'Armada Mobil'],
+            ['route' => 'admin.user.index',      'icon' => 'users',        'label' => 'Pengguna'],
         ],
     ],
     [
         'label'  => 'Keuangan',
         'single' => false,
-        'active' => request()->routeIs('admin.laporan.*','admin.akuntansi.*'),
+        'active' => request()->routeIs('admin.laporan.*', 'admin.akuntansi.*'),
         'items'  => [
-            ['route'=>'admin.laporan.index',   'icon'=>'trending-up','label'=>'Laporan'],
-            ['route'=>'admin.akuntansi.index', 'icon'=>'book-open', 'label'=>'Akuntansi'],
+            ['route' => 'admin.laporan.index',   'icon' => 'trending-up',  'label' => 'Laporan'],
+            ['route' => 'admin.akuntansi.index', 'icon' => 'book-open',    'label' => 'Akuntansi'],
         ],
     ],
     [
         'label'  => 'Chat',
         'single' => true,
-        'route'  =>'admin.chat.index',
-        'icon'   =>'chat',
+        'route'  => 'admin.chat.index',
+        'icon'   => 'chat',
         'active' => request()->routeIs('admin.chat.*'),
     ],
     [
-        'label'  => 'Halaman',
-        'single' => true,
-        'route'  => 'admin.pages.index',
-        'icon'   => 'document-text',
+        'label'  => 'Pengaturan',
+        'single' => false,
         'active' => request()->routeIs('admin.pages.*'),
+        'items'  => [
+            ['route' => 'admin.pages.index', 'icon' => 'document-text', 'label' => 'Halaman Statis'],
+        ],
     ],
 ];
 @endphp
 
-@foreach($groups as $group)
-    @if($group['single'])
+@foreach ($groups as $group)
+    @if ($group['single'])
         <a href="{{ route($group['route']) }}"
            class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium
                   transition-colors
@@ -63,7 +64,7 @@ $groups = [
                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900' }}">
                 {{ $group['label'] }}
                 <x-icon name="chevron-down"
-                    class="w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180" />
+                        class="w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180" />
             </button>
 
             {{-- Dropdown --}}
@@ -71,8 +72,8 @@ $groups = [
                         rounded-xl border border-gray-100 bg-white p-1.5 opacity-0 shadow-lg
                         transition-all duration-150
                         group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                @foreach($group['items'] as $item)
-                    @php $itemActive = request()->routeIs($item['route'].'*'); @endphp
+                @foreach ($group['items'] as $item)
+                    @php $itemActive = request()->routeIs($item['route'] . '*'); @endphp
                     <a href="{{ route($item['route']) }}"
                        class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors
                               {{ $itemActive
